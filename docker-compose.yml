@@ -1,0 +1,59 @@
+version: "3.7"
+services:
+  db:
+    image: postgres:latest
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "${POSTGRES_USER}", "-d", "${POSTGRES_DB}"]
+      interval: 1s
+    ports:
+      - "5432:${POSTGRES_PORT}"
+    environment:
+      - POSTGRES_USER
+      - POSTGRES_PASSWORD
+      - POSTGRES_DB
+    networks:
+      - db
+
+  mqtt:
+    image: eclipse-mosquitto:latest
+#    healthcheck:
+#      test: ["CMD", "mosquitto_pub", "-h", "localhost", "-t", "test", "-m", "test"]
+#      interval: 1s
+    volumes:
+      - mosquitto-data:/mosquitto/data
+      - mosquitto-log:/mosquitto/log
+      - ./mqtt/mosquitto.conf:/mosquitto/config/mosquitto.conf
+
+    networks:
+      - mqtt
+    ports:
+      - "1883:${MQTT_TCP_PORT}"
+      - "9001:${MQTT_WS_PORT}"
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "8080:${BACKEND_PORT}"
+    depends_on:
+      - db
+      - mqtt
+    env_file: .env
+    environment:
+      - POSTGRES_HOST=db
+
+    networks:
+      - db
+      - mqtt
+
+networks:
+  db:
+  mqtt:
+
+volumes:
+    db-data:
+    mosquitto-data:
+    mosquitto-log:
