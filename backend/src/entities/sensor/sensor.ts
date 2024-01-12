@@ -6,7 +6,7 @@ import {TemperatureAndHumidityRecord} from "./temperature-and-humidity-record";
 @Entity()
 export class Sensor {
     @PrimaryColumn({
-        type: "number",
+        type: "integer",
         nullable: false,
     })
     id!: number;
