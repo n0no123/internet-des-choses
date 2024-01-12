@@ -1,4 +1,4 @@
-import jsonwebtoken, {JwtPayload} from "jsonwebtoken";
+import { verify, type JwtPayload} from "jsonwebtoken";
 import {Request, Response, NextFunction} from "express";
 import env from "../../../../misc/env";
 import {Account} from "../../../../entities/account/account";
@@ -14,7 +14,7 @@ declare global {
 
 const promiseVerify = (token: string, secret: string) =>
     new Promise<string | JwtPayload | undefined>((resolve, reject) => {
-        jsonwebtoken.verify(token, secret, (err, decoded) => {
+        verify(token, secret, (err, decoded) => {
             if (err) {
                 reject(err);
             } else {
