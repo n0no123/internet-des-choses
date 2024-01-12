@@ -1,7 +1,7 @@
 import {Handler} from "../../misc/handler";
 import datasource from "../../../../misc/datasource";
 import {Account} from "../../../../entities/account/account";
-import jsonwebtoken from "jsonwebtoken";
+import { sign } from "jsonwebtoken";
 import env from "../../../../misc/env";
 
 type Params = {
@@ -35,7 +35,7 @@ const handler: Handler<Params, Response> = async ({username, password}) => {
         const newAccount = accountRepository.create();
         newAccount.username = username;
         newAccount.setPassword(password);
-        const token = jsonwebtoken.sign(newAccount.id, env.jwt.secret, { expiresIn: env.jwt.expiresIn });
+        const token = sign({id: newAccount.id}, env.jwt.secret, { expiresIn: env.jwt.expiresIn });
 
         await accountRepository.save(newAccount);
 

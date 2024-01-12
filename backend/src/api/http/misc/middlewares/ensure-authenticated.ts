@@ -18,7 +18,12 @@ const promiseVerify = (token: string, secret: string) =>
             if (err) {
                 reject(err);
             } else {
-                resolve(decoded);
+                const id = (decoded as {id?: string}).id;
+
+                if (id === undefined) {
+                    reject("Invalid token");
+                }
+                resolve(id);
             }
         });
     });
