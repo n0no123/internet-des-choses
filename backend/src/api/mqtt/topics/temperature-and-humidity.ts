@@ -2,7 +2,7 @@ import datasource from "../../../misc/datasource";
 import {Sensor} from "../../../entities/sensor/sensor";
 
 type TemperatureAndHumidityRecord = {
-    id: string
+    id: number;
     temperature: number;
     humidity: number;
 }
@@ -10,8 +10,7 @@ type TemperatureAndHumidityRecord = {
 const ensureObjectIsValid = (obj: unknown): obj is TemperatureAndHumidityRecord =>
     typeof obj === "object" &&
     obj !== null &&
-    typeof (obj as Partial<TemperatureAndHumidityRecord>).id === "string" &&
-    !Number.isNaN(parseInt((obj as Partial<TemperatureAndHumidityRecord>).id!, 10)) &&
+    typeof (obj as Partial<TemperatureAndHumidityRecord>).id === "number" &&
     typeof (obj as Partial<TemperatureAndHumidityRecord>).temperature === "number" &&
     typeof (obj as Partial<TemperatureAndHumidityRecord>).humidity === "number";
 
@@ -20,7 +19,7 @@ const handler = async (message: string) => {
         const parsedMessage = JSON.parse(message);
         if (ensureObjectIsValid(parsedMessage)) {
             const sensorRepository = datasource.getRepository(Sensor);
-            const sensor = await sensorRepository.findOne({where: {id: parseInt(parsedMessage.id, 10)}});
+            const sensor = await sensorRepository.findOne({where: {id: parsedMessage.id}});
 
             if (sensor) {
                 sensor.data.push({
