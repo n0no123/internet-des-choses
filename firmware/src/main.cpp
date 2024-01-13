@@ -38,6 +38,7 @@ void setup() {
     client.begin("192.168.1.10", net);
     connect();
 }
+
 void loop() {
     client.loop();
     if (!client.connected()) {

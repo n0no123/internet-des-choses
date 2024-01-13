@@ -24,7 +24,7 @@ router.put("/", async (req, res) => {
     }
 });
 
-router.get("/", async (req, res) => {
+router.post("/", async (req, res) => {
     const parseResult = z.object({
         username: z.string().min(3),
         password: z.string().min(8),
