@@ -1,0 +1,19 @@
+{
+  "version": "2.4.2",
+  "compilerOptions": {
+    "outDir": "dist",
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "noImplicitAny": true,
+    "removeComments": true,
+    "preserveConstEnums": true,
+    "sourceMap": false,
+    "allowSyntheticDefaultImports": true,
+    "strict": true
+
+  },
+  "file": "src/index.ts",
+  "exclude": [
+    "node_modules"
+  ]
+}
