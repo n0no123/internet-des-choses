@@ -41,4 +41,12 @@ router.get("/temperature-and-humidity/:serialNumber", ensureAuthenticated, async
     }
 });
 
+router.get("/lookup", ensureAuthenticated, async (req, res) => {
+    const user = req.user;
+
+    return res.status(200).json({
+        sensors: user.sensors.map(({id, type, name}) => ({id, type, name}))
+    });
+});
+
 export default router;
