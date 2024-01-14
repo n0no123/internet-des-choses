@@ -6,13 +6,14 @@ import datasource from "../../../../misc/datasource";
 type Params = {
     type: SensorType;
     serialNumber: number;
+    name?: string | undefined;
 }
 
 type Response = {
     error?: string;
 } | undefined
 
-const handler: Handler<Params, Response> = async ({type, serialNumber}) => {
+const handler: Handler<Params, Response> = async ({type, serialNumber, name}) => {
     const sensorRepository = datasource.getRepository(Sensor);
     const doesSensorExist = await sensorRepository.findOne({
         where: {
@@ -32,6 +33,7 @@ const handler: Handler<Params, Response> = async ({type, serialNumber}) => {
         newSensor.id = serialNumber;
         newSensor.type = type;
         newSensor.data = [];
+        newSensor.name = name ?? "Unnamed sensor";
         await sensorRepository.save(newSensor);
 
         return {

@@ -14,6 +14,7 @@ router.put("/", ensureAuthenticated, async (req, res) => {
     const parseResult = z.object({
         serialNumber: z.number(),
         type: z.enum([SensorType.TemperatureAndHumidity]),
+        name: z.string().optional(),
     }).safeParse(req.body);
 
     if (!parseResult.success) {
