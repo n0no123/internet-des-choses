@@ -34,7 +34,7 @@ const handler: Handler<Params, Response> = async ({serialNumber, user}) => {
             }
         }
     } else {
-        if (sensor.ownerAccount !== undefined) {
+        if (sensor.ownerAccount?.id !== user.id) {
             return {
                 statusCode: 403,
                 body: {
