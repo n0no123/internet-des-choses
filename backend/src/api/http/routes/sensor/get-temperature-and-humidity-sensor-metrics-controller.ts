@@ -14,6 +14,7 @@ type Response = {
     metrics: {
         temperature: number;
         humidity: number;
+        timestamp: number;
     }[]
 }
 
