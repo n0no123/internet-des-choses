@@ -20,7 +20,19 @@ const handler: Handler<Params, Response> = async ({serialNumber, user}) => {
             id: serialNumber,
         },
     });
+    const userWithSensors = await userRepository.findOne({
+        where: { id: user.id },
+        relations: ["sensors"],
+    });
 
+    if (userWithSensors === undefined || userWithSensors === null) {
+        return { //should never happen since we're using ensureAuthenticated
+            statusCode: 500,
+            body: {
+                error: "Internal server error",
+            }
+        }
+    }
     if (sensor === null) {
         return {
             statusCode: 404,
@@ -36,9 +48,9 @@ const handler: Handler<Params, Response> = async ({serialNumber, user}) => {
             await userRepository.save(owner);
         }
         sensor.ownerAccount = user;
-        user.sensors.push(sensor);
+        userWithSensors.sensors.push(sensor);
         await sensorRepository.save(sensor);
-        await userRepository.save(user);
+        await userRepository.save(userWithSensors);
         return {
             statusCode: 200,
             body: undefined
