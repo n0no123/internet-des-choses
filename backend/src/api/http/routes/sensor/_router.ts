@@ -23,7 +23,7 @@ router.put("/", ensureAuthenticated, async (req, res) => {
     else {
         const result = await create(parseResult.data);
 
-        res.status(result.statusCode);
+        res.sendStatus(result.statusCode);
     }
 });
 
