@@ -5,6 +5,8 @@ import {z} from "zod";
 import {SensorType} from "../../../../entities/sensor/sensor-type";
 import getTemperatureAndHumiditySensorMetricsController from "./get-temperature-and-humidity-sensor-metrics-controller";
 import ensureAuthenticated from "../../misc/middlewares/ensure-authenticated";
+import datasource from "../../../../misc/datasource";
+import {Account} from "../../../../entities/account/account";
 
 const router = Router();
 
@@ -42,10 +44,20 @@ router.get("/temperature-and-humidity/:serialNumber", ensureAuthenticated, async
 });
 
 router.get("/lookup", ensureAuthenticated, async (req, res) => {
-    const user = req.user;
+    const userWithSensors = await datasource.getRepository(Account)
+        .findOne({
+            where: { id: req.user.id },
+            relations: ["sensors"],
+        })
+
+    if (userWithSensors === undefined || userWithSensors === null) {
+        return res.status(500).json({ //should never happen since we're using ensureAuthenticated
+            error: "Internal server error",
+        });
+    }
 
     return res.status(200).json({
-        sensors: user.sensors.map(({id, type, name}) => ({id, type, name}))
+        sensors: userWithSensors.sensors.map(({id, type, name}) => ({id, type, name}))
     });
 });
 
