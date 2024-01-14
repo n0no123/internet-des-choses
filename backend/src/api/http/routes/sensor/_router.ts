@@ -29,7 +29,7 @@ router.put("/", ensureAuthenticated, async (req, res) => {
 
 router.get("/temperature-and-humidity/:serialNumber", ensureAuthenticated, async (req, res) => {
     const parseResult = z.object({
-        serialNumber: z.number(),
+        serialNumber: z.string().transform(s => parseInt(s, 10)).refine(s => !isNaN(s))
     }).safeParse(req.params);
 
     if (!parseResult.success) {

@@ -42,7 +42,7 @@ router.post("/", async (req, res) => {
 
 router.put("/claim-sensor/:serialNumber", ensureAuthenticated, async (req, res) => {
     const parseResult = z.object({
-        serialNumber: z.number(),
+        serialNumber: z.string().transform(s => parseInt(s, 10)).refine(s => !isNaN(s))
     }).safeParse(req.params);
 
     if (!parseResult.success) {
@@ -61,7 +61,7 @@ router.put("/claim-sensor/:serialNumber", ensureAuthenticated, async (req, res) 
 
 router.delete("/release-sensor/:serialNumber", ensureAuthenticated, async (req, res) => {
     const parseResult = z.object({
-        serialNumber: z.number(),
+        serialNumber: z.string().transform(s => parseInt(s, 10)).refine(s => !isNaN(s))
     }).safeParse(req.params);
 
     if (!parseResult.success) {
