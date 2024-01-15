@@ -49,7 +49,7 @@ let weatherProvider: WeatherProvider;
 export const getWeather = async (zipcode: string) =>
 {
     if (!weatherProvider) {
-        weatherProvider = new WeatherProvider(env.openWeatherApiKey);
+        weatherProvider = new WeatherProvider(env.openWeatherMapApiKey);
     }
 
     return await weatherProvider.getForecast(zipcode);
