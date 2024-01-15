@@ -12,6 +12,7 @@ router.put("/", async (req, res) => {
     const parseResult = z.object({
         username: z.string().min(3),
         password: z.string().min(8),
+        zipcode: z.string().length(5),
     }).safeParse(req.body);
 
     if (!parseResult.success) {

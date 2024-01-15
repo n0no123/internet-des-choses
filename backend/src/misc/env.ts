@@ -18,6 +18,7 @@ const asInt = (value: string) => {
 
 const env = {
     bcryptRounds: asInt(getEnv("BCRYPT_ROUNDS")),
+    openWeatherApiKey: getEnv("OPEN_WEATHER_API_KEY"),
     postgres: {
         host: getEnv("POSTGRES_HOST"),
         port: asInt(getEnv("POSTGRES_PORT")),

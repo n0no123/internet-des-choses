@@ -2,6 +2,7 @@ import {Account} from "../../../../entities/account/account";
 import {Handler} from "../../misc/handler";
 import datasource from "../../../../misc/datasource";
 import {Sensor} from "../../../../entities/sensor/sensor";
+import {Forecast, getWeather} from "../../../../providers/weather-provider";
 
 type Params = {
     serialNumber: number;
@@ -15,7 +16,8 @@ type Response = {
         temperature: number;
         humidity: number;
         timestamp: number;
-    }[]
+    }[];
+    previsions: Forecast[];
 }
 
 const handler: Handler<Params, Response> = async ({serialNumber, user}) => {
@@ -46,7 +48,8 @@ const handler: Handler<Params, Response> = async ({serialNumber, user}) => {
             return {
                 statusCode: 200,
                 body: {
-                    metrics: sensor.data
+                    metrics: sensor.data,
+                    previsions: getWeather(sensor.ownerAccount.zipcode)
                 }
             }
         }

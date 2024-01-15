@@ -1,6 +1,5 @@
-import {BaseEntity, Column, Entity, JoinColumn, OneToMany, PrimaryGeneratedColumn} from "typeorm";
+import {Column, Entity, OneToMany, PrimaryGeneratedColumn} from "typeorm";
 import {compareSync, hashSync} from "bcrypt";
-import { v4 } from "uuid";
 import env from "../../misc/env";
 import {Sensor} from "../sensor/sensor";
 import {AccountPermissionLevel} from "./account-permission-level";
@@ -23,6 +22,9 @@ export class Account {
         default: AccountPermissionLevel.USER
     })
     permissionLevel!: AccountPermissionLevel;
+
+    @Column({ nullable: false })
+    zipcode!: string;
 
     @OneToMany(() => Sensor, (sensor) => sensor.ownerAccount)
     sensors!: Sensor[];

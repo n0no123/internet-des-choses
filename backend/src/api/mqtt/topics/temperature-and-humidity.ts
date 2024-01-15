@@ -1,5 +1,6 @@
 import datasource from "../../../misc/datasource";
 import {Sensor} from "../../../entities/sensor/sensor";
+import decrypt from "../utils/decrypt";
 
 type TemperatureAndHumidityRecord = {
     id: number;
@@ -16,7 +17,8 @@ const ensureObjectIsValid = (obj: unknown): obj is TemperatureAndHumidityRecord 
 
 const handler = async (message: string) => {
     try {
-        const parsedMessage = JSON.parse(message);
+        const decrypted = decrypt(message, "zazu")
+        const parsedMessage = JSON.parse(decrypted);
         if (ensureObjectIsValid(parsedMessage)) {
             const sensorRepository = datasource.getRepository(Sensor);
             const sensor = await sensorRepository.findOne({where: {id: parsedMessage.id}});
