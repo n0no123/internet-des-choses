@@ -2,10 +2,27 @@
 
 #include <WiFiManager.h>
 #include <MQTT.h>
+#include <DHT.h>
 
 WiFiManager wifiManager;
 WiFiClient net;
 MQTTClient client;
+DHT dht(D1, DHT11);
+
+#define KEY "zazu"
+
+unsigned long previousMillis = 0;    // will store last time DHT was updated
+
+// Updates DHT readings every 10 seconds
+const long interval = 10000;
+
+String encrypt(String s, String key) {
+    String encrypted;
+    for (int i = 0; i < s.length(); i++) {
+        encrypted += (char) (s[i] ^ key[i % key.length()]);
+    }
+    return encrypted;
+}
 
 const char *id = "1";
 
@@ -27,6 +44,7 @@ void connect() {
 void setup() {
     Serial.begin(115200);
     Serial.println("Starting...");
+    dht.begin();
 
     wifiManager.autoConnect();
     wifiManager.setSaveConfigCallback([]() {
@@ -44,14 +62,29 @@ void loop() {
     if (!client.connected()) {
         connect();
     }
+    unsigned long currentMillis = millis();
 
-    client.publish(
-        "temperatureAndHumidityTopic",
-        "{"
-            "\"id\": " + String(id) + ","
-            "\"temperature\": 25.0,"
-            "\"humidity\": 50.0"
-        "}"
-    );
-    delay(1000);
+    if (currentMillis - previousMillis >= interval) {
+        previousMillis = currentMillis;
+        float temp = dht.readTemperature();
+        float humidity = dht.readHumidity();
+
+        if (isnan(temp) || isnan(humidity)) {
+            Serial.println("Failed to read from DHT sensor!");
+        } else {
+            const String msg = encrypt(
+                String(
+                    "{"
+                    "\"id\": " + String(id) + ","
+                    "\"temperature\": " + String(temp) + ","
+                    "\"humidity\": " + String(humidity) +
+                    "}"
+                ),
+                KEY
+            );
+
+            client.publish("temperatureAndHumidityTopic", msg.c_str());
+        }
+        delay(10);
+    }
 }
