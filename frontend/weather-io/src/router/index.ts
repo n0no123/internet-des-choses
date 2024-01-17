@@ -1,5 +1,8 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
+import SignInView from '../views/account/SignInView.vue'
+import SignUpView from '../views/account/SignUpView.vue'
+import { useAccountStore } from '@/stores/account';
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -16,8 +19,28 @@ const router = createRouter({
       // this generates a separate chunk (About.[hash].js) for this route
       // which is lazy-loaded when the route is visited.
       component: () => import('../views/AboutView.vue')
+    },
+    {
+      path: '/sign-in',
+      name: 'sign-in',
+      component: SignInView
+    },
+    {
+      path: '/sign-up',
+      name: 'sign-up',
+      component: SignUpView
     }
   ]
-})
+});
+
+router.beforeEach((to, from, next) => {
+  const store = useAccountStore();
+
+  if (to.name === 'home' && store.account.token === '') {
+    next({name: 'sign-in'});
+  } else {
+    next();
+  }
+});
 
 export default router
