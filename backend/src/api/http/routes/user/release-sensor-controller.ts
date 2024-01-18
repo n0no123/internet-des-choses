@@ -26,6 +26,7 @@ const handler: Handler<Params, Response> = async ({serialNumber, user}) => {
         where: {
             id: serialNumber,
         },
+        relations: ["ownerAccount"],
     });
 
     if (fetchedUser === null) {
