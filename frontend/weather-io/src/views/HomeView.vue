@@ -211,7 +211,7 @@ console.log(`token: ${JSON.stringify(store.account.token)}`);
           <h2 class="temperature">Température</h2>
         </div>
         <Chart :data="metricsChartData.get(sensor.id)" :size="{ width: windowWidth < 900 ? 400 : 800, height: 400 }"
-          :margin="{ top: 0, right: 0, bottom: 0, left: 0 }">
+          :margin="{ top: 20, right: 0, bottom: 0, left: 0 }">
           <template #layers>
             <Grid strokeDasharray="2,2" />
             <Line :dataKeys="['timestamp', 'temperature']" :lineStyle="{ stroke: 'red' }" />
@@ -232,7 +232,7 @@ console.log(`token: ${JSON.stringify(store.account.token)}`);
           <h2 class="temperature">Température</h2>
         </div>
         <Chart :data="previsionsChartData.get(sensor.id)" :size="{ width: windowWidth < 900 ? 400 : 800, height: 400 }"
-          :margin="{ top: windowWidth < 900 ? 30 : 0, right: 0, bottom: 0, left: 0 }">
+          :margin="{ top: 20, right: 0, bottom: 0, left: 0 }">
           <template #layers>
             <Grid strokeDasharray="2,2" />
             <Line :dataKeys="['timestamp', 'temperature']" :lineStyle="{ stroke: 'red' }" />
