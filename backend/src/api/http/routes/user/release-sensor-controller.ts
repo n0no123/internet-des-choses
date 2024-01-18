@@ -15,12 +15,27 @@ type Response = {
 const handler: Handler<Params, Response> = async ({serialNumber, user}) => {
     const sensorRepository = datasource.getRepository(Sensor);
     const userRepository = datasource.getRepository(Account);
+    const fetchedUser = await userRepository.findOne({
+        where: {
+            id: user.id,
+        },
+        relations: ["sensors"],
+    });
+
     const sensor = await sensorRepository.findOne({
         where: {
             id: serialNumber,
         },
     });
 
+    if (fetchedUser === null) {
+        return {
+            statusCode: 404,
+            body: {
+                error: "User does not exist",
+            }
+        }
+    }
     if (sensor === null) {
         return {
             statusCode: 404,
@@ -29,10 +44,18 @@ const handler: Handler<Params, Response> = async ({serialNumber, user}) => {
             }
         }
     } else {
+        if (sensor.ownerAccount?.id !== fetchedUser.id) {
+            return {
+                statusCode: 403,
+                body: {
+                    error: "User is not the owner of the sensor",
+                }
+            }
+        }
         sensor.ownerAccount = undefined;
-        user.sensors = user.sensors.filter(s => s.id !== sensor.id);
+        fetchedUser.sensors = fetchedUser.sensors.filter(s => s.id !== sensor.id);
         await sensorRepository.save(sensor);
-        await userRepository.save(user);
+        await userRepository.save(fetchedUser);
         return {
             statusCode: 200,
             body: undefined
