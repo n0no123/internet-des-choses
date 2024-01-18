@@ -25,7 +25,7 @@ const handler: Handler<Params, Response> = async ({serialNumber, user}) => {
         relations: ["sensors"],
     });
 
-    if (userWithSensors === undefined || userWithSensors === null) {
+    if (userWithSensors === null) {
         return { //should never happen since we're using ensureAuthenticated
             statusCode: 500,
             body: {
@@ -40,21 +40,22 @@ const handler: Handler<Params, Response> = async ({serialNumber, user}) => {
                 error: "Sensor does not exist",
             }
         }
-    } else {
-        if (sensor.ownerAccount !== undefined) {
-            const  owner = sensor.ownerAccount;
-
-            owner.sensors = owner.sensors.filter(s => s.id !== sensor.id);
-            await userRepository.save(owner);
-        }
-        sensor.ownerAccount = user;
-        userWithSensors.sensors.push(sensor);
-        await sensorRepository.save(sensor);
-        await userRepository.save(userWithSensors);
+    }
+    if (sensor.ownerAccount !== undefined) {
         return {
-            statusCode: 200,
-            body: undefined
+            statusCode: 400,
+            body: {
+                error: "Sensor is already claimed",
+            }
         }
+    }
+    sensor.ownerAccount = userWithSensors;
+    userWithSensors.sensors.push(sensor);
+    await sensorRepository.save(sensor);
+    await userRepository.save(userWithSensors);
+    return {
+        statusCode: 200,
+        body: undefined,
     }
 };
 

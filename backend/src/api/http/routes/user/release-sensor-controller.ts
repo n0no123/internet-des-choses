@@ -43,23 +43,30 @@ const handler: Handler<Params, Response> = async ({serialNumber, user}) => {
                 error: "Sensor does not exist",
             }
         }
-    } else {
-        if (sensor.ownerAccount?.id !== fetchedUser.id) {
-            return {
-                statusCode: 403,
-                body: {
-                    error: "User is not the owner of the sensor",
-                }
+    }
+    if (sensor.ownerAccount === undefined) {
+        return {
+            statusCode: 400,
+            body: {
+                error: "Sensor is not claimed",
             }
         }
-        sensor.ownerAccount = undefined;
-        fetchedUser.sensors = fetchedUser.sensors.filter(s => s.id !== sensor.id);
-        await sensorRepository.save(sensor);
-        await userRepository.save(fetchedUser);
+    }
+    if (sensor.ownerAccount?.id !== fetchedUser.id) {
         return {
-            statusCode: 200,
-            body: undefined
+            statusCode: 403,
+            body: {
+                error: "User is not the owner of the sensor",
+            }
         }
+    }
+    sensor.ownerAccount = undefined;
+    fetchedUser.sensors = fetchedUser.sensors.filter(s => s.id !== sensor.id);
+    await sensorRepository.save(sensor);
+    await userRepository.save(fetchedUser);
+    return {
+        statusCode: 200,
+        body: undefined
     }
 };
 
