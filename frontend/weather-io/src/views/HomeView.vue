@@ -100,77 +100,17 @@ const getData = async (serialNumber: number) => {
 
 const loadData = async () => {
   store.sensors = await lookupSensor();
-  store.sensors.map(async (sensor) => await getData(sensor.id).then((data) => sensorData.value.set(sensor.id, data)));
+  setInterval(() => {
+    store.sensors.map(async (sensor) => await getData(sensor.id).then((data) => sensorData.value.set(sensor.id, data)));
 
-  setMockSensorData();
-
-  sensorData.value.forEach((value, key) => {
-    metricsChartData.value.set(key, value.metrics.slice(0, 12).map(e => ({ timestamp: new Date(e.timestamp).toISOString().slice(14, 19), temperature: e.temperature, humidity: e.humidity })));
-    previsionsChartData.value.set(key, value.previsions.slice(0, 8).map(e => ({ timestamp: new Date(e.timestamp).toISOString().slice(11, 16), temperature: e.temperature, humidity: e.humidity })));
-  });
+    sensorData.value.forEach((value, key) => {
+      metricsChartData.value.set(key, value.metrics.slice(-6).map(e => ({ timestamp: new Date(e.timestamp).toISOString().slice(14, 19), temperature: e.temperature, humidity: e.humidity })));
+      previsionsChartData.value.set(key, value.previsions.slice(0, 8).map(e => ({ timestamp: new Date(e.timestamp).toISOString().slice(11, 16), temperature: e.temperature, humidity: e.humidity })));
+    });
+  }, 5000);
 }
 
-loadData().then(() => fetchMockSensorData());
-
-const setMockSensorData = () => {
-  sensorData.value.set(1,
-    {
-      metrics: [
-        { temperature: Math.random() * 100, humidity: Math.random() * 100, timestamp: new Date().getTime() },
-        { temperature: Math.random() * 100, humidity: Math.random() * 100, timestamp: new Date().getTime() + (10800 * 1000) },
-        { temperature: Math.random() * 100, humidity: Math.random() * 100, timestamp: new Date().getTime() + (10800 * 2000) },
-        { temperature: Math.random() * 100, humidity: Math.random() * 100, timestamp: new Date().getTime() + (10800 * 3000) },
-        { temperature: Math.random() * 100, humidity: Math.random() * 100, timestamp: new Date().getTime() + (10800 * 4000) },
-        { temperature: Math.random() * 100, humidity: Math.random() * 100, timestamp: new Date().getTime() + (10800 * 5000) },
-        { temperature: Math.random() * 100, humidity: Math.random() * 100, timestamp: new Date().getTime() + (10800 * 6000) },
-        { temperature: Math.random() * 100, humidity: Math.random() * 100, timestamp: new Date().getTime() + (10800 * 7000) },
-        { temperature: Math.random() * 100, humidity: Math.random() * 100, timestamp: new Date().getTime() + (10800 * 8000) },
-        { temperature: Math.random() * 100, humidity: Math.random() * 100, timestamp: new Date().getTime() + (10800 * 9000) },
-        { temperature: Math.random() * 100, humidity: Math.random() * 100, timestamp: new Date().getTime() + (10800 * 10000) },
-        { temperature: Math.random() * 100, humidity: Math.random() * 100, timestamp: new Date().getTime() + (10800 * 11000) },
-      ],
-      previsions: [
-        { temperature: 10, humidity: 37, timestamp: new Date().getTime() },
-        { temperature: 20, humidity: 12, timestamp: new Date().getTime() + (10800 * 1000) },
-        { temperature: 15, humidity: 38, timestamp: new Date().getTime() + (10800 * 2000) },
-        { temperature: 5, humidity: 29, timestamp: new Date().getTime() + (10800 * 3000) },
-        { temperature: 25, humidity: 4, timestamp: new Date().getTime() + (10800 * 4000) },
-        { temperature: 30, humidity: 11, timestamp: new Date().getTime() + (10800 * 5000) },
-        { temperature: 15, humidity: 23, timestamp: new Date().getTime() + (10800 * 6000) },
-        { temperature: 35, humidity: 16, timestamp: new Date().getTime() + (10800 * 7000) },
-      ]
-    }
-  );
-}
-
-const fetchMockSensorData = () => {
-  intervalIds.value.push(
-    setInterval(() => {
-      sensorData.value.set(1,
-        {
-          metrics: [
-            ...sensorData.value.get(1)?.metrics ?? [],
-            { temperature: Math.random() * 100, humidity: Math.random() * 100, timestamp: new Date().getTime() },
-          ],
-          previsions: [
-            { temperature: 10, humidity: 37, timestamp: new Date().getTime() },
-            { temperature: 20, humidity: 12, timestamp: new Date().getTime() + (10800 * 1000) },
-            { temperature: 15, humidity: 38, timestamp: new Date().getTime() + (10800 * 2000) },
-            { temperature: 5, humidity: 29, timestamp: new Date().getTime() + (10800 * 3000) },
-            { temperature: 25, humidity: 4, timestamp: new Date().getTime() + (10800 * 4000) },
-            { temperature: 30, humidity: 11, timestamp: new Date().getTime() + (10800 * 5000) },
-            { temperature: 15, humidity: 23, timestamp: new Date().getTime() + (10800 * 6000) },
-            { temperature: 35, humidity: 16, timestamp: new Date().getTime() + (10800 * 7000) },
-          ]
-        }
-      );
-      sensorData.value.forEach((value, key) => {
-        metricsChartData.value.set(key, value.metrics.slice(value.metrics.length - 12, value.metrics.length).map(e => ({ timestamp: new Date(e.timestamp).toISOString().slice(14, 19), temperature: e.temperature, humidity: e.humidity })));
-        previsionsChartData.value.set(key, value.previsions.slice(0, 8).map(e => ({ timestamp: new Date(e.timestamp).toISOString().slice(11, 16), temperature: e.temperature, humidity: e.humidity })));
-      });
-    }, 5000)
-  );
-}
+loadData();
 
 
 const handleResize = () => {

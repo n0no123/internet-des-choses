@@ -49,7 +49,7 @@ const handler: Handler<Params, Response> = async ({serialNumber, user}) => {
                 statusCode: 200,
                 body: {
                     metrics: sensor.data,
-                    previsions: getWeather(sensor.ownerAccount.zipcode)
+                    previsions: await getWeather(sensor.ownerAccount.zipcode)
                 }
             }
         }
